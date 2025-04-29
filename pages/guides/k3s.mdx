@@ -1,0 +1,65 @@
+---
+title: 'Install K3s'
+description: 'Set up the kubernetes cluster'
+---
+
+
+## 1. Intro
+In this documentation, you'll learn how to install K3s and set up your Kubernetes cluster using the Single Server Architecture explained in the [K3s Architecture](/pages/architecture/k3s-architecture) page.
+
+This guide closely follows NetworkChuck's excellent [video](https://www.youtube.com/watch?v=X9fSMGkjtug&list=LL&index=42&t=0s) on setting up a Raspberry Pi cluster—feel free to check it out!
+
+## 2. Pre-requisites
+
+This guide assumes that:
+- You have followed the [Raspberry Pi setup](/page/guides/raspberrypi) guide.
+- You have all your compute nodes connected to the same network.
+
+## 3. Setup the Server Node
+
+<Steps>
+  <Step title="Connect to your Server Node via SSH">
+    Open the terminal and connect to your Pi using:
+    ```bash
+    ssh <username>@<hostname>
+    ```
+  </Step>
+  <Step title="Install K3s">
+    After connecting, install k3s on your node
+    ```bash
+    curl -sfL https://get.k3s.io | sh -
+    ```
+  </Step>
+  <Step title="Get Server Token">
+    With k3s installed, now we need to get the Server Token, so we can use it to register the Agent nodes.
+    ```bash
+    cat /var/lib/rancher/k3s/server/node-token
+    ```
+    <Note> Save this token—we'll need it for the next steps. </Note>
+  </Step>
+</Steps>
+
+## 3. Setup the Agent Nodes
+Repeat this process for each agent node to connect them all to your server.
+
+<Steps>
+  <Step title="Connect to your Server Node via SSH">
+    Open the terminal and connect to your Pi using:
+    ```bash
+    ssh <username>@<hostname>
+    ```
+  </Step>
+  <Step title="Install K3s">
+    Before installation, you'll need two things:
+
+    - The server node **IP address**
+    - The server node **token** from the previous steps.
+
+    Use these values to complete and run the following command
+    ```bash
+    curl -sfL https://get.k3s.io | K3S_URL=https://<server_node_ip>:6443 K3S_TOKEN=<server_node_token> sh -
+    ```
+  </Step>
+</Steps>
+<Check>**You are done setting up you K3s cluster!**</Check>
+
