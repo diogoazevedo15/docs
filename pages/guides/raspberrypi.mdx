@@ -1,0 +1,146 @@
+---
+title: 'Setup Raspberry Pis'
+description: 'Get every Pi ready to be used'
+---
+
+
+## 1. Intro
+Before starting, I would like to give a special thanks to NetworkChuck for the excellent [video](https://www.youtube.com/watch?v=X9fSMGkjtug&list=LL&index=42&t=0s) on how to set up a Raspberry Pi cluster.
+
+This documentation page closely follows that video's instructions, with some changes to reflect some of the updates that have been made to the [Raspberry Pi Imager](https://www.raspberrypi.com/software/).
+
+**Make sure to follow the steps in this guide for all your Raspberry Pis.**
+
+## 2. Pre-requisites
+
+There is a single prerequisite for this guide:
+
+- Download and install [Raspberry Pi Imager](https://www.raspberrypi.com/software/)
+
+<Note>This guide shows how to setup a **Raspberry Pi 5** using Raspeberry Pi imager **v1.8.5**</Note>
+
+## 3. Install OS
+
+<Steps>
+  <Step title="Choose Device">
+  First, select your device. In this case, we are using a Raspberry Pi 5.
+    <img
+    className="block"
+    src="/images/rpi-select-device.gif"
+    alt="rpi-select-device"
+    />
+  </Step>
+  <Step title="Choose OS">
+    Select **Raspberry Pi OS Lite 64-bit** as your headless OS.
+    <img
+    className="block"
+    src="/images/rpi-select-os.gif"
+    alt="rpi-select-os"
+    />
+  </Step>
+  <Step title="Choose your storage">
+    Select the storage device where you want to install the operating system.
+    <img
+    className="block"
+    src="/images/rpi-select-storage.png"
+    alt="rpi-select-os"
+    />
+  </Step>
+  <Step title="Set Hostname, Username and Password">
+    Under the **General** tab, set your hostname, username and password.
+    The password you set here will be used when connecting to your node via SSH.
+    <Tip> **Tip:** Use the same name for Username and Hostname for consistency.</Tip>
+    <img
+    className="block"
+    src="/images/rpi-set-hostname.gif"
+    alt="rpi-set-hostname"
+    />
+  </Step>
+  <Step title="Enable SSH">
+    Enable SSH under the **Services** tab.
+    <img
+    className="block"
+    src="/images/rpi-enable-ssh.gif"
+    alt="rpi-enable-ssh"
+    />
+  </Step>
+  <Step title="Save">
+    Save the changes, and let the Imager set everything up.
+    <img
+    className="block"
+    src="/images/rpi-save-os.png"
+    alt="rpi-save-os"
+    />
+  </Step>
+  <Step title="Boot up your Pi">
+    Take the storage with the OS installed on it and connect to the Pi, power it up and allow it approximately 5 minutes to complete the boot process.
+  </Step>
+</Steps>
+
+
+## 3. Enable Cgroups
+As mentioned in the [K3s docs](https://docs.k3s.io/installation/requirements?_highlight=cgroup_memory%3D1&_highlight=cgroup_enable%3Dmemory&os=pi#cgroups), standard Raspberry Pi OS installations do not start with `cgroups` enabled. **K3S** requires `cgroups` to start the systemd service.
+
+The following steps will guide you through enabling cgroups on your Pi.
+
+<Steps>
+  <Step title="Reconnect the OS storage device to your computer">
+  After letting your Pi boot for the first time, turn it off and reconnect the OS storage to your computer.
+  </Step>
+  <Step title="Open cmdline.txt">
+    Open your OS storage device, navigate to and open the file named `cmdline.txt`.
+  </Step>
+  <Step title="Enable cgroups">
+    Add the following code to the end of the file:
+    ```
+    cgroup_memory=1 cgroup_enable=memory
+    ```
+
+    You should end up with something like this:
+    <img
+    className="block"
+    src="/images/rpi-edit-cmdlinetxt.png"
+    alt="rpi-edit-dmlinetxt"
+    />
+    After that do not forget to save.
+  </Step>
+  <Step title="Boot up your pi (again)">
+    After editing `cmdline.txt`, remove the storage device, connect it to the Pi, and power it up to reboot.  
+  </Step>
+</Steps>
+
+## 4. Setting a static IP
+Now all that is left is to set a static IP to whatever we would like to have.
+
+<Steps>
+  <Step title="Connect to your Pi via SSH">
+    Open the terminal and connect to your Pi using:
+    ```bash
+    ssh <username>@<hostname>
+    ```
+  </Step>
+  <Step title="Set the IP">
+    To set a static IP, we define:
+    - `ipv4.addresses` – The IP of this machine.
+    - `ipv4.gateway` – The router or default gateway.
+    - `ipv4.dns` – The DNS server to use (probably same as router).
+    - `ipv4.dns` – Leave it manual.
+
+    Define these values and use them for the following command:
+    ```bash
+    nmcli connection modify "Wired connection 1" \
+    ipv4.addresses <your_desired_ip>/24 \
+    ipv4.gateway <ip_of_router> \
+    ipv4.dns <ip_of_router> \ 
+    ipv4.method manual
+    ```
+  </Step>
+  <Step title="Reboot Pi">
+    For these changes to take effect we need to reboot our Pi.
+    ```bash
+    reboot
+    ```
+  </Step>
+</Steps>
+
+<Check>**You are done setting up your Raspberry Pis!**</Check>

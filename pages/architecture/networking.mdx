@@ -1,0 +1,54 @@
+---
+title: 'Networking'
+description: 'The networking I got outside of K3s stuff'
+---
+
+<Frame>
+<img
+  className="block dark:hidden"
+  src="/images/networking-ips-light.png"
+  alt="Ips Light"
+/>
+<img
+  className="hidden dark:block"
+  src="/images/networking-ips-dark.png"
+  alt="Architecture Dark"
+/>
+</Frame>
+
+## Static IP Assignment
+In my homelab, I require identical network behavior whether I’m at home, in the office, or on the road. To achieve this, I assign static IP addresses to my core devices on the 192.168.8.0/24 network:
+
+| Device | Role | IPv4 Address |
+| --- | --- | --- |
+| Router | Default gateway | `192.168.8.1` |
+| Switch | Layer-2 switch | `192.168.8.2` |
+| RpiMaster | Compute node | `192.168.8.5` |
+| RpiNode #1 | Compute node | `192.168.8.6` |
+| RpiNode #2 | Compute node | `192.168.8.7` |
+| RpiNode #3 (soon) | Compute node | `192.168.8.8` |
+
+
+<Tip> This way, no matter where I plug in, **I always reach the same IPs.** </Tip>
+
+## DNS Aliases for Service Access
+
+To simplify access to management interfaces and services, I use a consistent domain namespace under `da.lab`. I add DNS host entries on my router that map sub-domains to the static IPs:
+
+| Alias                     | Target IP       | Purpose                     |
+| ------------------------- | --------------- | --------------------------- |
+| `da.lab.router`    | 192.168.8.1     | Router UI                   |
+| `da.lab.switch`    | 192.168.8.2     | Switch UI                   |
+
+
+<Tabs>
+  <Tab title="Router">
+    This is what i see when i access `da.lab.router`.
+    <img src="/images/networking-router-interface.png" />
+  </Tab>
+  <Tab title="Switch">
+     This is what i see when i access `da.lab.switch`.
+     <img src="/images/networking-switch-interface.png" />
+  </Tab>
+
+</Tabs>
